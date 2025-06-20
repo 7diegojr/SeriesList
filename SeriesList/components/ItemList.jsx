@@ -1,126 +1,115 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
+import React from 'react'
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
+import { Feather } from '@expo/vector-icons'
 
 export default function ItemList({ item, markSeries, unmarkSeries, markEpisode, unmarkEpisode, removeSeries }) {
-  const renderEpisode = ({ item: episode }) => (
-    <View style={styles.episodeContainer}>
-      <Text style={episode.completed ? styles.episodeCompleted : styles.episode}>
-        {episode.name}
-      </Text>
-      <TouchableOpacity
-        style={styles.actionIcon}
-        onPress={() =>
-          episode.completed
-            ? unmarkEpisode(item.id, episode.id)
-            : markEpisode(item.id, episode.id)
-        }
-      >
-        <Ionicons
-          name={episode.completed ? 'checkmark-circle-outline' : 'checkmark-circle'}
-          size={24}
-          color="#fff"
-        />
-      </TouchableOpacity>
-    </View>
-  );
-
+  const handleMarkSeries = () => {
+    item.episodes.forEach(ep => {
+      if (!ep.completed) markEpisode(item.id, ep.id);
+    });
+    markSeries(item.id);
+  };
 
   return (
-    <View style={styles.seriesContainer}>
+    <View style={styles.itemContainer}>
       <View style={styles.seriesHeader}>
-        <Text style={item.completed ? styles.seriesCompleted : styles.series}>
-          {item.name}
-        </Text>
-        <View style={styles.seriesActions}>
-          <TouchableOpacity
-            style={styles.actionIcon}
-            onPress={() => (item.completed ? unmarkSeries(item.id) : markSeries(item.id))}
-          >
-            <Ionicons
-              name={item.completed ? 'checkmark-circle-outline' : 'checkmark-circle'}
-              size={24}
-              color="#fff"
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionIcon, { backgroundColor: 'darkred' }]}
-            onPress={() => removeSeries(item.id)}
-          >
-            <Ionicons name="trash-bin-outline" size={24} color="#fff" />
+        <Text style={item.completed ? styles.seriesCompleted : styles.seriesTitle}>{item.name}</Text>
+        <View style={styles.actions}>
+          {!item.completed ? (
+            <TouchableOpacity onPress={handleMarkSeries} style={styles.actionIcon}>
+              <Feather name='check-square' size={24} color='#fff' />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => unmarkSeries(item.id)} style={styles.actionIcon}>
+              <Ionicons name='refresh-outline' size={24} color='#fff' />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity onPress={() => removeSeries(item.id)} style={[styles.actionIcon, { backgroundColor: 'darkred' }]}>
+            <Ionicons name='trash-bin-outline' size={24} color='#fff' />
           </TouchableOpacity>
         </View>
       </View>
-      <FlatList
-        data={item.episodes}
-        renderItem={renderEpisode}
-        keyExtractor={(episode) => episode.id.toString()}
-        style={styles.episodeList}
-      />
+
+      {item.episodes.map((ep) => (
+        <View key={ep.id} style={styles.episodeItem}>
+          <Text style={ep.completed ? styles.episodeCompleted : styles.episodeText}>{ep.name}</Text>
+          {!ep.completed ? (
+            <TouchableOpacity onPress={() => markEpisode(item.id, ep.id)} style={styles.episodeIcon}>
+              <Ionicons name='checkmark-outline' size={20} color='#fff' />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => unmarkEpisode(item.id, ep.id)} style={styles.episodeIcon}>
+              <Ionicons name='remove-circle-outline' size={20} color='#fff' />
+            </TouchableOpacity>
+          )}
+        </View>
+      ))}
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
-  seriesContainer: {
+  itemContainer: {
     backgroundColor: '#000000c0',
-    padding: 15,
-    borderRadius: 7,
-    borderColor: 'white',
-    borderWidth: 2,
-    marginVertical: 5,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+    borderColor: '#fff',
+    borderWidth: 2
   },
   seriesHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 10
   },
-  series: {
-    flex: 1,
+  seriesTitle: {
+    fontSize: 20,
     color: '#fff',
-    fontSize: 24,
-    textDecorationLine: 'none',
+    fontWeight: 'bold',
+    flex: 1
   },
   seriesCompleted: {
-    flex: 1,
+    fontSize: 20,
     color: '#fff',
-    fontSize: 24,
+    fontWeight: 'bold',
     textDecorationLine: 'line-through',
+    flex: 1
   },
-  seriesActions: {
-    flexDirection: 'row',
-  },
-  episodeList: {
-    marginTop: 10,
-    marginLeft: 20,
-  },
-  episodeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 5,
-  },
-  episode: {
-    flex: 1,
-    color: '#fff',
-    fontSize: 18,
-    textDecorationLine: 'none',
-  },
-  episodeCompleted: {
-    flex: 1,
-    color: '#fff',
-    fontSize: 18,
-    textDecorationLine: 'line-through',
+  actions: {
+    flexDirection: 'row'
   },
   actionIcon: {
     height: 40,
     width: 40,
-    borderRadius: 20,
     backgroundColor: 'darkgreen',
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+    marginLeft: 10
   },
+  episodeItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    backgroundColor: '#1c1c1c',
+    borderRadius: 6,
+    marginVertical: 2
+  },
+  episodeText: {
+    color: '#fff',
+    fontSize: 16,
+    flex: 1
+  },
+  episodeCompleted: {
+    color: '#aaa',
+    fontSize: 16,
+    textDecorationLine: 'line-through',
+    flex: 1
+  },
+  episodeIcon: {
+    marginLeft: 10
+  }
 });

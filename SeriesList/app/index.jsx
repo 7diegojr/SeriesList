@@ -50,15 +50,16 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 16,
+    fontSize: 18,
     color: 'grey',
     alignSelf: 'center',
     textAlign: 'center',
+    top: 60,
   },
   button: {
     position: 'absolute',
     backgroundColor: '#000',
-    bottom: -20,
+    bottom: 230,
     alignSelf: 'center',
     borderRadius: 50,
     paddingVertical: 15,
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   buttonText: {
-    fontSize: 22,
+    fontSize: 26,
     color: '#fff',
     fontWeight: 'bold',
   },
